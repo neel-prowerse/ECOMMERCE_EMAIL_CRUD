@@ -1,11 +1,12 @@
 from django.shortcuts import render,redirect
-from .models import Mobile,Company
+from .models import Mobile,Company,Cart, Order
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import UserCreateForm,MobileForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-# from django.contrib.auth.decoators import login_required 
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required 
 # Create your views here.
 
 # This is index it consists of dropdown logic
@@ -23,6 +24,54 @@ def add(request):
     else:
         form = MobileForm()
         return render(request, 'add.html',{'form':form})
+    
+# Modify the add_to_cart function
+@login_required
+def add_to_cart(request, id):
+    if request.user.is_authenticated:
+        mobile = get_object_or_404(Mobile, id=id)
+        cart_item, created = Cart.objects.get_or_create(user=request.user, mobile=mobile)
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+        # Redirect to index after adding to cart
+        return redirect('/show/')
+    else:
+        # If user is not logged in, redirect to the login page
+        return redirect('loginaccount')
+    
+@login_required
+def remove_from_cart(request, mobile_id):
+    # Get the cart item to be removed
+    cart_item = get_object_or_404(Cart, user=request.user, mobile_id=mobile_id)
+    # Delete the cart item
+    cart_item.delete()
+    # Redirect back to the checkout page or any other appropriate page
+    return redirect('checkout') 
+
+# Modify the checkout function
+@login_required
+def checkout(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_price = sum(item.mobile.Price * item.quantity for item in cart_items)
+    return render(request, 'checkout.html', {'cart_items': cart_items, 'total_price': total_price})
+# Modify the index function to display add to cart buttons
+
+def order_confirmation(request):
+    return render(request, 'order_confirmation.html')
+
+
+# Modify the confirm_checkout function
+def confirm_checkout(request):
+    if request.method == 'POST':
+        # Retrieve shipping information from the form
+        # ... (Remaining code as before)
+
+        # Redirect to order confirmation page
+        return redirect('order_confirmation')
+    else:
+        # If not a POST request, redirect to checkout page
+        return redirect('checkout')
 
 # This is show logic it shows all products
 def show(request):
@@ -60,7 +109,7 @@ def update(request, id):
 def delete(request, id):
     mobile = Mobile.objects.get(id=id)
     mobile.delete()
-    return redirect('/show/')
+    return redirect('show')
 
 # This is register logic through this we can register or sign-up
 def register(request):
@@ -72,7 +121,7 @@ def register(request):
                 user = User.objects.create_user(request.POST['username'],password=request.POST['password1'])
                 user.save()
                 login(request,user)
-                return redirect('index')
+                return redirect('loginaccount')
             except IntegrityError:
                 return render(request,'register.html',{'form':UserCreateForm,'error':'Username already exists.'})
         else:
@@ -91,7 +140,7 @@ def loginaccount(request):
             return redirect('index')
 
 # This is logout logic through this we can logout or if user is already logout it will show error message.
-# @login_required
+@login_required
 def logoutaccount(request):
     logout(request)
     return redirect('index')

@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 from django import forms
-from .models import Mobile, Company
+from .models import Mobile
 
 class UserCreateForm(UserCreationForm):
   def __init__(self, *args, **kwargs) :
@@ -14,6 +14,12 @@ class MobileForm(forms.ModelForm):
     class Meta:
         model = Mobile
         fields = "__all__"
+
+
+# class CartForm(forms.ModelForm):
+#     class Meta:
+#       model = Cart
+#       fields = "__all__"
 
 # class CompanyForm(forms.ModelForm):
 #   class Meta:

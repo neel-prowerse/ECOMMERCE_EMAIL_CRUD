@@ -1,57 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>All Products</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        <style>
-            .navbar 
-            {
-                margin-bottom: 50px;
-                border-radius: 0;
-            }
-        </style>
-    </head>
-    <body>
-        <nav class="navbar navbar-inverse">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>                        
-                    </button>
-                    <a class="navbar-brand" href="/">Logo</a>
-                </div>
-                <div class="collapse navbar-collapse" id="myNavbar">
-                    <ul class="nav navbar-nav">
-                        <li class="active">
-                            <a href="/">Home</a>
+<head>
+    <title>All Products</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        /* Custom styles */
+        .navbar-brand {
+            color: #fff; /* White text */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('background.jpg'); /* URL of your background image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #343a40; /* Dark background for the navbar */
+            border-color: #343a40;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+        .navbar-brand:hover {
+            color: #ccc; /* Light gray text on hover */
+        }
+        .product-name:hover
+        {
+            transform: scale(1.1);
+        }
+        .background-container {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Adjusted height to fit the viewport */
+            overflow: hidden; /* Hide overflow to prevent scrollbars */
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure the image covers the entire container */
+            transition: box-shadow 0.3s ease; /* Smooth transition for the shadow effect */
+        }
+        img:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Shadow effect on hover */
+            transform: scale(1.1);
+
+        }
+        .dropdown-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px; /* Adjusted max-width */
+            width: 90%; /* Adjusted width */
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 15px; /* Increased margin */
+        }
+        button {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 18px;
+        }
+        /* Adding background color */
+        .container {
+            background-color: #e9ecef; /* Light gray background */
+            padding: 20px;
+            border-radius: 10px; /* Rounded corners */
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
+                </button>
+                <a class="navbar-brand" href="/">Logo</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="active">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'show' %}">All Products</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'logoutaccount' %}">
+                                <span class="glyphicon glyphicon-user"></span>&emsp;{{ user.username }}  
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url 'loginaccount' %}">Login</a>
                         </li>
                         <li>
-                            <a href="{% url 'show' %}">All Products</a>
+                            <a href="{% url 'register' %}">Sign Up</a>
                         </li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'logoutaccount' %}">
-                                    <span class="glyphicon glyphicon-user"></span>&emsp;{{ user.username }}  
-                                </a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a class="nav-link" href="{% url 'loginaccount' %}">Login</a>
-                            </li>
-                            <li>
-                                <a class="nav-link" href="{% url 'register' %}">Sign Up</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'checkout' %}">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>&emsp;Cart
+                            <span class="badge">{{ request.session.cart_items }}</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </nav>
+        </div>
+    </nav>
         <div class="container">    
             <div class="row">
                 {% if not mobiles %}
@@ -63,24 +137,28 @@
                         <div class="col-sm-4">
                             <div class="panel panel-primary">
                                 <div class="panel-body">
-                                    <img src="{{i.img.url}}" class="img-responsive" style="width:100%" alt="Image">
+                                    <img src="{{ i.img.url }}" class="img-fluid" alt="Image">
                                 </div>
-                                <center> 
-                                    <a href="{% url 'showid' i.id %}" target="_blank">
-                                        <h3>{{i.Name}}</h3>
-                                    </a>
-                                    <h4>Price : ₹ {{i.Price}}</h4>
-                                </center>
-                                <div class="panel-footer">{{i.Description}}<br>
-                                    <center>
-                                        <a href="/update/{{i.id}}" class="btn btn-dark">
-                                            <span class="btn glyphicon glyphicon-pencil">Edit</span>
+                                <div class="panel-footer">
+                                    <div class="text-center">
+                                        <a href="{% url 'showid' i.id %}" target="_blank">
+                                            <h3 class="product-name">{{ i.Name }}</h3>
                                         </a>
-                                        <a href="/delete/{{i.id}}" class="btn btn-danger">Delete</a>
-                                    </center>
-                                </div> 
-                            </div>     
+                                        <h4>Price: ₹ {{ i.Price }}</h4>
+                                    </div>
+                                    <div class="text-center">
+                                        <p>{{ i.Description }}</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <a href="/update/{{ i.id }}" class="btn btn-dark">
+                                            <span class="glyphicon glyphicon-pencil"></span> Edit
+                                        </a>
+                                        <a href="/delete/{{ i.id }}" class="btn btn-danger">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        
                     {% endfor %}
                 {% endif %}
             </div>

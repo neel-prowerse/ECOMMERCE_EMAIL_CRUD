@@ -5,71 +5,141 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        <style>
-            body    
-            {
-                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            }
-        </style>
-    </head>
-    <body>
-        <nav class="navbar navbar-inverse">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>                        
-                    </button>
-                    <a class="navbar-brand" href="/">Logo</a>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <title>Index Mobile</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <!-- Bootstrap CSS -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+            <style>
+                /* Custom styles */
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f8f9fa; /* Light gray background */
+                    margin: 0;
+                    padding: 0;
+                }
+                .navbar {
+                    background-color: #343a40; /* Dark background */
+                    border-color: #343a40;
+                    border-radius: 0;
+                    margin-bottom: 0;
+                }
+                .navbar-brand {
+                    color: #fff; /* White text */
+                }
+                .navbar-brand:hover {
+                    color: #ccc; /* Light gray text on hover */
+                }
+                .background-container {
+                    position: relative;
+                    width: 100%;
+                    height: 100vh; /* Adjusted height to fit the viewport */
+                    overflow: hidden; /* Hide overflow to prevent scrollbars */
+                }
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover; /* Ensure the image covers the entire container */
+                     /* Adjust brightness of the image */
+                }
+                .dropdown-container {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+                    border-radius: 10px;
+                    padding: 20px;
+                    max-width: 400px; /* Adjusted max-width */
+                    width: 90%; /* Adjusted width */
+                }
+                select {
+                    padding: 10px;
+                    font-size: 16px;
+                    width: 100%;
+                    margin-bottom: 15px; /* Increased margin */
+                }
+                button {
+                    width: 100%;
+                    padding: 10px 0;
+                    font-size: 18px;
+                }
+            </style>
+        </head>
+        <body>
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>                        
+                        </button>
+                        <a class="navbar-brand" href="/">Logo</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="myNavbar">
+                        <ul class="nav navbar-nav">
+                            <li class="active">
+                                <a href="/">Home</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'show' %}">All Products</a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            {% if user.is_authenticated %}
+                                <li>
+                                    <a href="{% url 'logoutaccount' %}">
+                                        <span class="glyphicon glyphicon-user"></span>&emsp;{{ user.username }}  
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="{% url 'loginaccount' %}">Login</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'register' %}">Sign Up</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
-                <div class="collapse navbar-collapse" id="myNavbar">
-                    <ul class="nav navbar-nav">
-                        <li class="active">
-                            <a href="/">Home</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'show' %}">All Products</a>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'logoutaccount' %}">
-                                    <span class="glyphicon glyphicon-user"></span>&emsp;{{ user.username }}  
-                                </a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a class="nav-link" href="{% url 'loginaccount' %}">Login</a>
-                            </li>
-                            <li>
-                                <a class="nav-link" href="{% url 'register' %}">Sign Up</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <div class="container">
-            <form method="post">
-                {% csrf_token %}
-                {% for i in mobile %}
-                    <div class="card" style="width: 60%;">
-                        <img src="{{i.img.url}}" class="card-img-left" alt="..." width="74%">
+            </nav>
+<div class="container">
+    <div class="row">
+        {% for i in mobile %}
+        <div class="col-md-12">
+            <div class="card mb-3">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img src="{{ i.img.url }}" class="card-img" alt="...">
+                    </div>
+                    <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title">Model Name : {{i.Name}}</h5>
-                            <h5 class="card-title">PRICE : ₹{{i.Price}}</h5>
-                            <h5 class="card-text">Description : {{i.Description}}</h5>
-                            <h5 class="card-text">RAM : {{i.RAM}}</h5>
-                            <h5 class="card-text">Camera : {{i.Camera}}</h5>
-                            <h5 class="card-text">Display : {{i.Display}}</h5>
-                            <h5 class="card-text">OS : {{i.OS}}</h5>
-                            <h5 class="card-text">Brand : {{ i.company }}</h5>
+                            <h5 class="card-title">Model Name: {{ i.Name }}</h5>
+                            <h5 class="card-title">Price: ₹{{ i.Price }}</h5>
+                            <p class="card-text">Description: {{ i.Description }}</p>
+                            <p class="card-text">RAM: {{ i.RAM }}</p>
+                            <p class="card-text">Camera: {{ i.Camera }}</p>
+                            <p class="card-text">Display: {{ i.Display }}</p>
+                            <p class="card-text">OS: {{ i.OS }}</p>
+                            <p class="card-text">Brand: {{ i.company }}</p>
+                            <form action="{% url 'add_to_cart' id=i.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                            </form>
                         </div>
                     </div>
-                {% endfor %}
-            </form>
+                </div>
+            </div>
         </div>
+        {% endfor %}
+    </div>
+</div>
+            
     </body>
 </html>

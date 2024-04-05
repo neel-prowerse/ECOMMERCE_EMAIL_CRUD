@@ -1,106 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Index Mobile</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        <style>
-            .navbar
-            {
-                margin-bottom: 0px;
-                border-radius: 0;
-            }
-            body, html  
-            {
-                margin: 0;
-                padding: 0;
-                height: 100%;
-            }
-            .background-container   
-            {
-                position: relative;
-                width: 100%;
-                height: 100%;
-            }
-            img     
-            {
-                width: 100%;
-                height: 100%;
-                opacity: 0.7;
-            }
-            .dropdown-container 
-            {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                align-items: center;
-                transform: translate(-50%, -50%);
-                padding: 20px;
-                border-radius: 10px;
-            }
-            select  
-            {
-                padding: 10px;
-                font-size: 16px;
-            }
-        </style>
-    </head>
-    <body>
-        <nav class="navbar navbar-inverse">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>                        
-                    </button>
-                    <a class="navbar-brand" href="/">Logo</a>
-                </div>
-                <div class="collapse navbar-collapse" id="myNavbar">
-                    <ul class="nav navbar-nav">
-                        <li class="active">
-                            <a href="/">Home</a>
+<head>
+    <title>Index Mobile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #343a40; /* Dark background */
+            border-color: #343a40;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+        .navbar-brand {
+            color: #fff; /* White text */
+        }
+        .navbar-brand:hover {
+            color: #ccc; /* Light gray text on hover */
+        }
+        .background-container {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Adjusted height to fit the viewport */
+            overflow: hidden; /* Hide overflow to prevent scrollbars */
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure the image covers the entire container */
+            filter: brightness(0.6); /* Adjust brightness of the image */
+        }
+        .dropdown-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px; /* Adjusted max-width */
+            width: 90%; /* Adjusted width */
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 15px; /* Increased margin */
+        }
+        button {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
+                </button>
+                <a class="navbar-brand" href="/">Logo</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="active">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'show' %}">All Products</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'logoutaccount' %}">
+                                <span class="glyphicon glyphicon-user"></span>&emsp;{{ user.username }}  
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url 'loginaccount' %}">Login</a>
                         </li>
                         <li>
-                            <a href="{% url 'show' %}">All Products</a>
+                            <a href="{% url 'register' %}">Sign Up</a>
                         </li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'logoutaccount' %}">
-                                    <span class="glyphicon glyphicon-user"></span>&emsp;{{ user.username }}  
-                                </a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a class="nav-link" href="{% url 'loginaccount' %}">Login</a>
-                            </li>
-                            <li>
-                                <a class="nav-link" href="{% url 'register' %}">Sign Up</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <!-- Header section end -->
-        <div class="background-container">
-            <img src="https://st2.depositphotos.com/1001877/5759/i/450/depositphotos_57593913-stock-photo-mobile-phones-background-pile-of.jpg" alt="mobile phones"/>
-            <div class="dropdown-container">
-                <form action="/show/{{company.id}}" method="get">
-                    <select name="searchTerm">
-                        <option value="--- Select A Mobile Phone Brand ---" disabled selected>--- Select A Mobile Phone Brand ---</option>
-                        {% for i in company %}
-                            <option value="{{i.name}}">{{i.name}}</option>
-                        {% endfor %}
-                    </select><br><br>
-                    <center>
-                        <button class="btn btn-primary">Submit</button>
-                    </center>
-                </form>
+                    {% endif %}
+                </ul>
             </div>
         </div>
-    </body>
+    </nav>
+    <!-- Header section end -->
+    <div class="background-container">
+        <img src="https://img.freepik.com/free-photo/showing-cart-trolley-shopping-online-sign-graphic_53876-133967.jpg" alt="mobile phones"/>
+        <div class="dropdown-container">
+            <form action="/show/{{company.id}}" method="get">
+                <center><h4>Select A Brand</h4> </center><br>
+                <select name="searchTerm" class="form-control">
+                    <option value="--- Select A Mobile Phone Brand ---" disabled selected>--- Select A Mobile Phone Brand ---</option>
+                    {% for i in company %}
+                        <option value="{{i.name}}">{{i.name}}</option>
+                    {% endfor %}
+                </select><br>
+                <button class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
 </html>
