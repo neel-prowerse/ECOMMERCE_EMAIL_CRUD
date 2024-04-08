@@ -10,6 +10,8 @@
 <body>
     <h1>Order Confirmation</h1>
     <p>Your order has been successfully placed!</p>
-    <!-- You can customize this page further with order details or additional instructions -->
+    {% for order in orders %}
+        <h3>{{ order.user }}, Thank You for choosing us...</h3>
+    {% endfor %}
 </body>
 </html>

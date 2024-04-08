@@ -13,6 +13,7 @@
                 background-color: #f8f9fa; /* Light gray background */
                 margin: 0;
                 padding: 0;
+                background-color: aquamarine;
             }
             .navbar {
                 background-color: #343a40; /* Dark background */
@@ -121,6 +122,7 @@
                                 <fieldset>
                                     {% csrf_token %}
                                     {{ form.as_p }}
+                                    EMAIL : <input type="email" class="form-control" name="email" placeholder="Enter Your Email Address" required/>
                                     <button type="submit" class="btn btn-primary">Register Now</button>
                                 </fieldset>
                             </form>

@@ -7,6 +7,10 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required 
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.conf import settings
+from django.core.mail import send_mail
 # Create your views here.
 
 # This is index it consists of dropdown logic
@@ -20,7 +24,7 @@ def add(request):
         form = MobileForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('/show/')
+            return redirect('show')
     else:
         form = MobileForm()
         return render(request, 'add.html',{'form':form})
@@ -34,19 +38,15 @@ def add_to_cart(request, id):
         if not created:
             cart_item.quantity += 1
             cart_item.save()
-        # Redirect to index after adding to cart
-        return redirect('/show/')
+        return redirect('checkout')
     else:
-        # If user is not logged in, redirect to the login page
         return redirect('loginaccount')
     
 @login_required
 def remove_from_cart(request, mobile_id):
-    # Get the cart item to be removed
     cart_item = get_object_or_404(Cart, user=request.user, mobile_id=mobile_id)
-    # Delete the cart item
     cart_item.delete()
-    # Redirect back to the checkout page or any other appropriate page
+    # cart_item.save()
     return redirect('checkout') 
 
 # Modify the checkout function
@@ -55,22 +55,23 @@ def checkout(request):
     cart_items = Cart.objects.filter(user=request.user)
     total_price = sum(item.mobile.Price * item.quantity for item in cart_items)
     return render(request, 'checkout.html', {'cart_items': cart_items, 'total_price': total_price})
+
 # Modify the index function to display add to cart buttons
-
 def order_confirmation(request):
-    return render(request, 'order_confirmation.html')
-
+    orders = Order.objects.all()
+    return render(request, 'order_confirmation.html',{'orders':orders})
 
 # Modify the confirm_checkout function
 def confirm_checkout(request):
     if request.method == 'POST':
-        # Retrieve shipping information from the form
-        # ... (Remaining code as before)
-
-        # Redirect to order confirmation page
+        subject = 'Checkout Succefully...'
+        message = 'Your order has been confirmed...'
+        from_email = settings.EMAIL_HOST_USER
+        email = request.POST.get('email')
+        recipient_list = [email]
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True)
         return redirect('order_confirmation')
     else:
-        # If not a POST request, redirect to checkout page
         return redirect('checkout')
 
 # This is show logic it shows all products
@@ -100,7 +101,7 @@ def update(request, id):
         form = MobileForm(request.POST, request.FILES, instance=mobile)
         if form.is_valid():
             form.save()
-            return redirect('/show/')  # Redirect to the Show URL after saving
+            return redirect('/show/')
     else:
         form = MobileForm(instance=mobile)
     return render(request, 'edit.html', {'mobile': mobile, 'form': form})
@@ -109,7 +110,11 @@ def update(request, id):
 def delete(request, id):
     mobile = Mobile.objects.get(id=id)
     mobile.delete()
-    return redirect('show')
+    referer_url = request.META.get('HTTP_REFERER')
+    if referer_url:
+        return HttpResponseRedirect(referer_url)
+    else:
+        return HttpResponseRedirect(reverse('show'))
 
 # This is register logic through this we can register or sign-up
 def register(request):
@@ -118,9 +123,14 @@ def register(request):
     else:
         if request.POST['password1'] == request.POST['password2']:
             try:
-                user = User.objects.create_user(request.POST['username'],password=request.POST['password1'])
+                user = User.objects.create_user(request.POST['username'],password=request.POST['password1'],email=request.POST['email'])
                 user.save()
                 login(request,user)
+                subject = 'Registration Complete'
+                message = f'Hello {request.POST["username"]}, Thank You for Registering account in ECOMMERCE.'
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [user.email]
+                send_mail(subject,message,email_from,recipient_list, fail_silently=True)
                 return redirect('loginaccount')
             except IntegrityError:
                 return render(request,'register.html',{'form':UserCreateForm,'error':'Username already exists.'})
@@ -134,7 +144,7 @@ def loginaccount(request):
     else:
         user = authenticate(request, username = request.POST['username'],password = request.POST['password'])
         if user is None:
-            return render(request, 'login.html',{'form':AuthenticationForm(),'error':'username and password do not match'})
+            return render(request, 'login.html',{'form':AuthenticationForm(),'error':'Username and Password do not match'})
         else:
             login(request,user)
             return redirect('index')

@@ -29,6 +29,7 @@ class Cart(models.Model):
     
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cart_items = models.ForeignKey(Cart, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)

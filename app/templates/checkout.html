@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <title>Checkout</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +12,7 @@
             background-color: #f8f9fa; /* Light gray background */
             margin: 0;
             padding: 0;
+            background-color: aquamarine;
         }
         .navbar {
             background-color: #343a40; /* Dark background */
@@ -92,37 +84,52 @@
                     <table class="table">
                         <!-- Table Headers -->
                         <thead>
-                            <tr>
+                            <tr align="center">
                                 <th>Product</th>
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Total</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <!-- Table Body -->
                         <tbody>
                             {% load mathfilters %}
-                            {% for cart_item in cart_items %}
-                                <tr>
-                                    <td>{{ cart_item.mobile.Name }}</td>
-                                    <td>{{ cart_item.quantity }}</td>
-                                    <td>{{ cart_item.mobile.Price }}</td> <!-- Access Price attribute through associated Mobile object -->
-                                    <td>{{ cart_item.quantity|mul:cart_item.mobile.Price }}</td> <!-- Calculate total price using math_filters -->
-                                    <td> 
-                                        <form method="post" action="{% url 'remove_from_cart' cart_item.mobile.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                                        </form>
-                                </td>
+                            {% if cart_items %}
+                                {% for cart_item in cart_items %}
+                                    <tr>
+                                        <td>{{ cart_item.mobile.Name }}</td>
+                                        <td>{{ cart_item.quantity }}</td>
+                                        <td>{{ cart_item.mobile.Price }}</td> <!-- Access Price attribute through associated Mobile object -->
+                                        <td>{{ cart_item.quantity|mul:cart_item.mobile.Price }}</td> <!-- Calculate total price using math_filters -->
+                                        <td> 
+                                            <form method="post" action="{% url 'remove_from_cart' cart_item.mobile.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr align="center">
+                                    <td colspan="5" align="center">No Items Added Please Add Items to Checkout</td>
                                 </tr>
-                            {% endfor %}
+                                <tr align="center">
+                                    <td colspan="5">
+                                        <a href="/show/" class="btn btn-warning">Add To Cart</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                     <!-- Total Price -->
-                    <center><strong><p>Total Price: ₹ {{ total_price }}</p></strong></center>
+                    <center>
+                        <strong>
+                            <p>Total Price: ₹ {{ total_price }}</p>
+                        </strong>
+                    </center>
                 </div>
             </div>
-    
             <!-- Shipping Information Section -->
             <div class="col-md-6">
                 <h2>Shipping Information</h2>
@@ -139,6 +146,10 @@
                         <label for="address">Address:</label>
                         <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="email">Email Address:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
                     <!-- City and ZIP Code Inputs (Grouped in a Row) -->
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -151,7 +162,7 @@
                         </div>
                     </div>
                     <!-- Country Input -->
-                    <div class="form-group">
+                    <div class="form-group col-md-6">
                         <label for="country">Country:</label>
                         <input type="text" class="form-control" id="country" name="country" required>
                     </div>
@@ -160,8 +171,7 @@
                 </form>
             </div>
         </div>
-    </div>
-    
+    </div>    
     <!-- Bootstrap JS (Optional, if needed) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
